@@ -1143,7 +1143,7 @@ function card.ReportError(err)
     card.lastError = err
     if reported[err] then return end
     reported[err] = true
-    print("|cFFFF7043OpenXP card error|r (please send this to the OpenXP author): " .. err)
+    print(fmt(L("|cFFFF7043OpenXP card error|r (please send this to the OpenXP author): %s"), err))
 end
 
 local function LayoutBlock(b, step, first)

@@ -745,7 +745,7 @@ local function LoadGuide(guideData,n)
         end
         if enabled then
             if name and group and addon.guides[group .. "||" .. name] then
-                addon.error("Error trying to load a guide already parsed: " .. group .. "/" .. name)
+                addon.error(fmt(L("Tried to load an already parsed guide (%s/%s)"), group, name))
             end
             addon.AddGuide(guide)
         end
@@ -1080,10 +1080,8 @@ local function parseLine(linetext,step,parsingLogic)
             else
                 ltext = linetext
             end
-            return addon.error(L("Error parsing guide") .. " " ..
-                                   addon.currentGuideName ..
-                                   ": Invalid function call (." .. tag ..
-                                   ")\n" .. ltext)
+            return addon.error(fmt(L("Invalid command (.%s) in guide %s\n%s"),
+                                   tag, addon.currentGuideName, ltext))
         end
     end)
 

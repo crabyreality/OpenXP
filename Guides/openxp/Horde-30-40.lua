@@ -70,6 +70,7 @@ step
 step
     .goto Thousand Needles,81.63,77.95
     >>Talk to |cRXP_FRIENDLY_Trackmaster Zherin|r
+    >>|cRXP_WARN_Optional: the basilisks for this quest are level 33-37 and the Crystalhides stun. Skip this step if you're under 33 or it feels too hard; the guide goes on without it|r
     .accept 1175 >>Accept A Bump in the Road
     .target Trackmaster Zherin
 step
@@ -90,6 +91,7 @@ step
     .complete 1175,3 --A Bump in the Road
     .mob Saltstone Crystalhide
     .mob Saltstone Gazer
+    .isOnQuest 1175
 step
     .goto Thousand Needles,87.95,65.32
     >>Kill |cRXP_ENEMY_Salt Flats Scavenger|r. Loot them for |cRXP_LOOT_Hollow Vulture Bone|r
@@ -100,6 +102,7 @@ step
     >>Kill |cRXP_ENEMY_Saltstone Basilisk|r
     .complete 1175,1 --A Bump in the Road
     .mob Saltstone Basilisk
+    .isOnQuest 1175
 step
     .goto Thousand Needles,71.30,72.85
     >>Kill |cRXP_ENEMY_Scorpid Reaver|r. Loot them for |cRXP_LOOT_Salty Scorpid Venom|r (about 25% drop)
@@ -120,6 +123,7 @@ step
     >>Talk to |cRXP_FRIENDLY_Trackmaster Zherin|r
     .turnin 1175 >>Turn in A Bump in the Road
     .target Trackmaster Zherin
+    .isOnQuest 1175
 step
     .goto Thousand Needles,78.14,77.12
     >>Talk to |cRXP_FRIENDLY_Wizzle Brassbolts|r

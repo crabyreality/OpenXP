@@ -15,6 +15,15 @@ local function L(s) return addon.locale and addon.locale.Get and addon.locale.Ge
 -- Newest first. Each entry: version, date, list of changes.
 local CHANGELOG = {
     {
+        version = "1.3.65",
+        date = "November 2026",
+        changes = {
+            "Undead start (Tirisfal): skipping the step to go through the sewers into the Undercity no longer leaves the arrow stuck on the sewers",
+            "Fixed background steps that never ended (and kept the arrow) when the step they wait for is for another class",
+            "Horde Thousand Needles 30-31: A Bump in the Road is now optional. The basilisks are level 33-37 and stun, so skip it if you're under 33",
+        },
+    },
+    {
         version = "1.3.64",
         date = "November 2026",
         changes = {

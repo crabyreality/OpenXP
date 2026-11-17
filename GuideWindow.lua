@@ -1679,6 +1679,10 @@ function addon.ProcessGuideTable(guide)
 
     currentGuide.steps = {}
     currentGuide.tips = {}
+    -- Labels on steps this character doesn't get (e.g. "step << Paladin")
+    -- are handed to the next step it does get, so a "#completewith <label>"
+    -- step in the shared route still ends instead of staying open forever
+    local hiddenLabels
     local ProcessSteps
     local IncludeGuide
     local guideRef = {}
@@ -1723,6 +1727,10 @@ function addon.ProcessGuideTable(guide)
         local secondLabel = true
         for n, step in ipairs(guide.steps) do
             local isShown = addon.IsStepShown(step,currentGuide)
+            if not isShown and not startAt and step.label and not step.tip then
+                hiddenLabels = hiddenLabels or {}
+                tinsert(hiddenLabels, step.label)
+            end
             if isShown and startAt and (step.label == startAt or startAt == step.stepId) then
                 firstLabel = startAt
                 startAt = nil
@@ -1777,6 +1785,8 @@ function addon.ProcessGuideTable(guide)
                     else
                         tinsert(currentGuide.steps, iStep)
                         iStep.tipWindow = lastTip
+                        iStep.hiddenLabels = hiddenLabels
+                        hiddenLabels = nil
                     end
                     if iStep.elements then
                         for _,element in pairs(iStep.elements) do
@@ -2056,6 +2066,11 @@ function addon:LoadGuide(guide, OnLoad)
             end
         end
         step.level = tonumber(step.level) or 0
+        if step.hiddenLabels then
+            for _, label in ipairs(step.hiddenLabels) do
+                if not guide.labels[label] then guide.labels[label] = n end
+            end
+        end
         if step.label then guide.labels[step.label] = n end
 
         if not useV2GuideWindow then

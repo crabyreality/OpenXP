@@ -267,7 +267,7 @@ progress:SetColorTexture(C.blue[1], C.blue[2], C.blue[3], 1)
 local STATUS = {
     done = {text = "DONE", color = C.green, tip = "You finished this step."},
     skipped = {text = "SKIPPED", color = C.faint, tip = "You moved past this step without finishing it."},
-    chain = {text = "CHAIN MISSED", color = C.gold,
+    chain = {text = L("CHAIN MISSED"), color = C.gold,
              tip = "An earlier quest in this chain was skipped, so this one can't be picked up yet."},
 }
 card.STATUS = STATUS
@@ -470,6 +470,10 @@ end
 -- "Accept Quest Name" becomes the translated verb with the quest's name as
 -- the game (or Questie) gives it, once the step has looked it up.
 local function QuestStepText(e, text)
+    if e.questFormat and addon.locale.GuideQuestName then
+        local name = addon.locale.GuideQuestName(e.questId)
+        return name and fmt(e.questFormat, name) or text
+    end
     if not addon.guidePhrases or (e.tag ~= "accept" and e.tag ~= "turnin") then return text end
     local verb, name = text:match("^(Accept) (.+)$")
     if not verb then verb, name = text:match("^(Turn in) (.+)$") end
@@ -874,7 +878,8 @@ end
 
 local function QuestName(id)
     local info = QuestInfo(id)
-    return (info and info.n) or (addon.GetQuestName and addon.GetQuestName(id)) or fmt("#%d", id)
+    return (addon.locale.GuideQuestName and addon.locale.GuideQuestName(id)) or
+        (info and info.n) or (addon.GetQuestName and addon.GetQuestName(id)) or fmt("#%d", id)
 end
 
 -- Earlier quests in the chain that you still have to turn in, in order
@@ -1016,7 +1021,7 @@ function card.DetourStep()
     if not id then return end
     local info = QuestInfo(id) or {}
     local name = QuestName(id)
-    local level = info.l and info.l > 0 and fmt(" |cFF9EA3B3(lvl %d)|r", info.l) or ""
+    local level = info.l and info.l > 0 and (" |cFF9EA3B3" .. fmt(L("(lvl %d)"), info.l) .. "|r") or ""
     local elements, target
     if not (addon.IsOnQuest and addon.IsOnQuest(id)) then
         local who = info.s and info.s[1] or "?"
@@ -1305,7 +1310,7 @@ local function LayoutBlock(b, step, first)
                     local info = QuestInfo(q)
                     local onIt = addon.IsOnQuest and addon.IsOnQuest(q)
                     tinsert(rows, fmt("%d. %s%s%s", i, QuestName(q),
-                                      info and info.l and info.l > 0 and fmt(" (lvl %d)", info.l) or "",
+                                      info and info.l and info.l > 0 and (" " .. fmt(L("(lvl %d)"), info.l)) or "",
                                       onIt and L(" - in your log") or ""))
                 end
                 list = table.concat(rows, "\n")
@@ -1836,6 +1841,7 @@ end
 
 local function SplitGuideName(guide)
     local name = (guide and (guide.displayname or guide.name)) or ""
+    if addon.locale.GuideLabel then name = addon.locale.GuideLabel(name) end
     name = StripCodes(name):gsub("\\n", " "):gsub("\n", " ")
     local range, zone = name:match("^(%d+%s*%-%s*%d+)%s+(.+)$")
     if range then return zone, (range:gsub("%-", "–")) end
@@ -2135,7 +2141,7 @@ function card.Refresh(force)
     SetFont(header.range, -1)
     SetFont(header.step, -1)
     header.zone:SetWidth(0)
-    header.zone:SetText(zone:upper())
+    header.zone:SetText(addon.guideTitles and zone or zone:upper())
     local zoneMax = math.max(50, Width() - 150)
     if header.zone:GetStringWidth() > zoneMax then header.zone:SetWidth(zoneMax) end
     header.range:SetText(range)
@@ -2188,7 +2194,7 @@ function card.Refresh(force)
         for i = detourIndex + 1, #ids do
             if #texts >= count then break end
             local info = QuestInfo(ids[i])
-            tinsert(texts, QuestName(ids[i]) .. (info and info.l and info.l > 0 and fmt(" (lvl %d)", info.l) or ""))
+            tinsert(texts, QuestName(ids[i]) .. (info and info.l and info.l > 0 and (" " .. fmt(L("(lvl %d)"), info.l)) or ""))
         end
         if #texts < count then
             tinsert(texts, fmt(L("Back to the guide: %s"), QuestName(card.detour.target)))
@@ -2418,7 +2424,8 @@ local function ArrowUpdate(self, ...)
         af.texture:Show()
         af.arrived:Hide()
         Tint(af.dialRing, C.blue, 0.6)
-        af.oxpDist:SetText(fmt("%d yd", dist))
+        local distance = addon.guideNamesFr and dist * 0.9144 or dist
+        af.oxpDist:SetText(fmt(L("%d yd"), distance))
         af.oxpDist:SetTextColor(0.96, 0.97, 0.98)
     end
     local label = element and (element.title or (element.step and element.step.arrowtext))
@@ -2580,7 +2587,9 @@ function card.FillStepList()
     local steps = VisibleSteps()
     list.count = #steps
     SetFont(list.title, -1)
-    list.title:SetText((StripCodes((guide and (guide.displayname or guide.name)) or ""):gsub("\n", " ")))
+    local name = (guide and (guide.displayname or guide.name)) or ""
+    if addon.locale.GuideLabel then name = addon.locale.GuideLabel(name) end
+    list.title:SetText((StripCodes(name):gsub("\n", " ")))
     -- rows grow with the font size so big text doesn't overlap
     local rowH = math.max(18, FontSize(-1) + 6)
     if list.rowH ~= rowH then

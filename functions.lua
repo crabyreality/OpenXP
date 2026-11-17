@@ -694,6 +694,11 @@ function addon.GetQuestName(id)
     if type(id) ~= "number" then return end
     id = GetQuestId(id)
     local name
+    if addon.guideQuestNames then
+        local getTitle = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo
+        name = getTitle and getTitle(id)
+        if type(name) == "string" and name ~= "" then return name end
+    end
     if db and type(db.QueryQuest) == "function" and type(db.GetQuest) ==
         "function" then
         local quest = db:GetQuest(id)
@@ -964,16 +969,9 @@ function addon.ReplaceNpcIds(textLine,element)
     if inactive then
         return textLine:gsub("::%d+","")
     end
-    for name,npcId in string.gmatch(textLine, "|c%x%x%x%x%x%x%x%x([^|:]+)::(%d+)|r") do
-        --local newName
-        --if addon.player.lang ~= "en" then
-            local newName = addon.GetNpcName(tonumber(npcId))
-        --end
-        newName = newName or name
-        textLine = textLine:gsub(name.."::%d+",newName)
-    end
-
-    return textLine
+    return (textLine:gsub("(|c%x%x%x%x%x%x%x%x)([^|:]+)::(%d+)|r", function(color, name, npcId)
+        return color .. (addon.GetNpcName(tonumber(npcId)) or name) .. "|r"
+    end))
 end
 
 function addon.GetItemName(id)
@@ -5199,7 +5197,7 @@ function addon.functions.blastedLands(self)
         local lung = GetItemInfo(8392)
         local jowl = GetItemInfo(8391)
         element.text =
-            format("Collect the following items:\n14 %s\n11 %s\n6 %s\n6 %s\n5 %s",
+            format(L("Collect the following items:") .. "\n14 %s\n11 %s\n6 %s\n6 %s\n5 %s",
                               gizzard or L"Vulture Gizzard",
                               brain or L"Basilisk Brain",
                               pincer or L"Scorpok Pincer",
@@ -5794,7 +5792,7 @@ function addon.functions.buy(self, ...)
                         total = math.min(total, GetMoney() / cost)
                     end
 
-                    addon.comms.PrettyPrint("Buying " .. name .. " x" .. total) -- ok
+                    addon.comms.PrettyPrint(L("Buying %s x%d"), name, total)
                     local stack = select(8, GetItemInfo(id))
                     if quantity then
                         while total > 0 do
@@ -6211,7 +6209,13 @@ function addon.functions.macro(self, body, name, icon)
         body:gsub("spell:(%d+)",function(id)
             C_Spell.RequestLoadSpellData(tonumber(id))
          end)
-        return {name = name, icon = icon, body = body, textOnly = true, text = text}
+        if addon.guideNamesFr and addon.locale.GuideTerm then
+            name = addon.locale.GuideTerm(name)
+            body = body:gsub("(/targetexact )([^\n\\]+)", function(command, target)
+                return command .. addon.locale.GuideTerm(target)
+            end)
+        end
+        return {name = name, icon = icon, body = body, textOnly = true}
     end
     local element = self.element
     local step = element.step

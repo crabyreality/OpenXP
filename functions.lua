@@ -6212,7 +6212,7 @@ function addon.functions.macro(self, body, name, icon)
         if addon.guideNamesFr and addon.locale.GuideTerm then
             name = addon.locale.GuideTerm(name)
             body = body:gsub("(/targetexact )([^\n\\]+)", function(command, target)
-                return command .. addon.locale.GuideTerm(target)
+                return command .. (addon.GetForeverCreatureName(target) or addon.locale.GuideTerm(target))
             end)
         end
         return {name = name, icon = icon, body = body, textOnly = true}

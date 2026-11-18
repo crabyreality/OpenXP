@@ -18,7 +18,7 @@
 ## Category-ruRU: Задания
 ## Category-zhCN: 任务
 ## Category-zhTW: 任務
-## OptionalDeps: Questie
+## OptionalDeps: QuestieDB, Questie
 ## SavedVariables: OXPData, OXPDB, OXPSettings, OXPString, OXPQuestieDump
 ## SavedVariablesPerCharacter: OXPCData, OXPCTrackingData, OXPCComms, OXPCSettings
 

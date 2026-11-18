@@ -241,7 +241,7 @@ end
 -- sets addon.guidePhrases: English step text -> translation, keyed by a
 -- "skeleton" where names, icons, [item] links and numbers are {A}, {B}, ...
 -- so one sentence covers every step that only differs in those. Friendly
--- and enemy names are swapped for the client's own names (NPCnames.lua).
+-- and enemy names use the realm's NPC data when available (NPCnames.lua).
 -- Text with no translation stays English. tools/locale/guide_skeleton.py
 -- builds the same keys: change both together.
 
@@ -259,6 +259,10 @@ function addon.locale.GuideQuestName(id)
     if not (addon.guideQuestNames and id) then return end
     local getTitle = C_QuestLog and (C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo)
     local title = getTitle and getTitle(id)
+    if type(title) == "string" and title ~= "" then return title end
+    local db = addon.game == "FOREVER" and _G.LibQuestieDB
+    local quests = db and db.Quest
+    title = quests and quests.name and quests.name(id)
     if type(title) == "string" and title ~= "" then return title end
     return addon.guideQuestNames[id]
 end
@@ -287,13 +291,12 @@ end
 
 local function LocalName(raw)
     local localized = raw:gsub("|cRXP_(%u+)_(.-)|r", function(kind, name)
-        if NAME_KINDS[kind] then
-            local translated = FrenchGuideName(name)
-            if translated then return "|cRXP_" .. kind .. "_" .. translated .. "|r" end
-        end
-        if (kind == "FRIENDLY" or kind == "ENEMY") and addon.GetCreatureName then
-            return "|cRXP_" .. kind .. "_" .. addon.GetCreatureName(name) .. "|r"
-        end
+        if not NAME_KINDS[kind] then return end
+        local creature = kind == "FRIENDLY" or kind == "ENEMY"
+        local translated = creature and addon.GetForeverCreatureName and addon.GetForeverCreatureName(name)
+        translated = translated or FrenchGuideName(name)
+        if not translated and creature and addon.GetCreatureName then translated = addon.GetCreatureName(name) end
+        if translated then return "|cRXP_" .. kind .. "_" .. translated .. "|r" end
     end)
     if addon.guideNamesFr then
         localized = localized:gsub("%[([^|%[%]]+)%]", function(name)

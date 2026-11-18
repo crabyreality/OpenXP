@@ -46,6 +46,11 @@ def write_guides():
             value = "{" + lua_str(french[0]) + ", " + str(french[1]) + "}" if key == "ids" else lua_str(french)
             lines.append(f"    [{source}] = {value},")
         lines.append("}")
+    lines.extend(("", "-- English guide names matched to NPC IDs in QuestieDB for Forever.",
+                  "addon.foreverGuideNpcIds = {"))
+    for name, npc_id in sorted(read("forever_npcs.json").items()):
+        lines.append(f"    [{lua_str(name)}] = {npc_id},")
+    lines.append("}")
     path = ROOT / "locale/frFR_guide.lua"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return len(data["guide"])

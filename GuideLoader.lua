@@ -1037,7 +1037,8 @@ local function parseLine(linetext,step,parsingLogic)
         if addon.guideQuestNames and (tag == "accept" or tag == "turnin") then
             local verb = tag == "accept" and "Accept" or "Turn in"
             local name = text:match("^" .. verb .. " (.+)$")
-            local id = tonumber(line:match("^%.%S+%s+(%d+)"))
+            local rawId = tonumber(line:match("^%.%S+%s+(-?%d+)"))
+            local id = rawId and math.abs(rawId)
             textEn = text
             if id and name and not name:find("|", 1, true) and addon.guideQuestNames[id] then
                 questFormat = L(verb .. " %s")

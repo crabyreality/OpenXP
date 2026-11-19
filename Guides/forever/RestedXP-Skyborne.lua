@@ -1877,7 +1877,6 @@ step
     .goto 2521,43.37,45.86
     >>|TInterface/cursor/crosshair/interact.blp:20|tClick on the |cRXP_PICK_Bounty Available: Vulgara the Insatiable!|r
     .accept 93318 >>Accept WANTED: Vulgara the Insatiable
-    .target Bounty Available: Vulgara the Insatiable!
 -- step << Warrior/Rogue
 step
     .goto 2521,43.073,46.306
@@ -3625,7 +3624,6 @@ step << Alliance
     *Watch out for the |cRXP_ENEMY_Ornery Galestrider::251707|r.
     .turnin 92727 >>Turn in The Missing Scholar
     .accept 92849 >>Accept The Missing Scholar
-    .target Bloodstained Satchel::581822
     .mob Ornery Galestrider::251707
 step << Alliance
     #label LeavingValanaarA

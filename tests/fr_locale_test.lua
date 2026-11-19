@@ -77,4 +77,15 @@ assert(locale.GuideText("|cRXP_LOOT_Tattered Spellbook|r") == "|cRXP_LOOT_Tatter
 local grind = "|cRXP_WARN_Grind |cRXP_ENEMY_Mottled Boars|r. Loot them until you have 5 silver worth of vendor items|r"
 assert(locale.GuideText(grind):find("|cRXP_ENEMY_sangliers tachetés|r", 1, true))
 
+names[38] = "Nervi défias"
+names[9163] = "Dimeurtrodon"
+assert(addon.GetCreatureName("Defias Thug") == "Nervi défias")
+assert(locale.GuideText("|cRXP_ENEMY_Diemetradon|r") == "|cRXP_ENEMY_Dimeurtrodon|r")
+
+LibQuestieDB.Object.name = function(id)
+    return ({ [1763] = "ON RECHERCHE", [164867] = "RECHERCHE" })[id]
+end
+assert(locale.GuideText("Click the |cRXP_PICK_WANTED|r") == "Cliquez sur |cRXP_PICK_ON RECHERCHE|r")
+assert(locale.GuideText("Click the |cRXP_PICK_Dark Iron Wanted Poster|r") == "Cliquez sur |cRXP_PICK_RECHERCHE|r")
+
 print("French locale tests passed")

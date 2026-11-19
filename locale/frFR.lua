@@ -946,7 +946,7 @@ L["Duskwood test: kill and loot steps are now areas. The outline is drawn on you
 L["Duskwood test: kill and loot steps show their area shaded on the world map and minimap. Anywhere inside it the arrow says Here; outside, it leads you to the nearest edge"] = "bois de la Pénombre test: kill and loot steps montre leur zone ombragée sur la carte du monde et minicarte. N’importe où à l’intérieur la flèche dit Ici; dehors, il vous mène à la bordure la plus proche"
 L["Dwarf & Gnome"] = "Nain et gnome"
 L["Dwarf Priests: Desperate Prayer now shows. Pick it up from High Priest Rohan in Ironforge at 10 and turn it in to High Priestess Laurena when you reach Stormwind (the step was hidden by a typo and pointed at the wrong NPC)"] = "Prêtres nains: La prière désespérée se montre maintenant. Ramassez-la du Grand Prêtre Rohan en Forgefer à 10 ans et rendez-la à la Haute Prêtre Laurena quand vous atteignez Hurlevent (l’étape a été cachée par une typo et pointée sur le mauvais PNJ)"
-L["EARLIER STEPS"] = "ÉTAPES LES PLUS GRANDES"
+L["EARLIER STEPS"] = "Étapes précédentes"
 L["Each step on the card shows its step number under the icon"] = "Chaque étape de la carte affiche son numéro d’étape sous l’icône"
 L["Earthbind, Searing, Healing Totems + Healing Wave"] = "Bride de terre, Searing, Totems de guérison + Vague de guérison"
 L["Easily double pulled"] = "Doublement tiré"

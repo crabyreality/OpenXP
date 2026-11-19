@@ -2491,7 +2491,8 @@ end
 -- Step list: every step of the guide, click one to jump there
 ---------------------------------------------------------------------------
 
-local LIST_ROWS = 18
+local LIST_ROWS, LIST_WIDTH = 18, 340
+local LIST_ROW_INSET, LIST_ROW_PAD, LIST_NUMBER_WIDTH, LIST_TITLE_GAP = 4, 6, 30, 8
 local list
 
 local function StepSummary(step)
@@ -2522,39 +2523,42 @@ function card.BuildStepList()
     list:SetBackdropColor(unpack(C.bg))
     list:SetBackdropBorderColor(unpack(C.border))
     list:SetFrameStrata("DIALOG")
-    list:SetWidth(340)
+    list:SetWidth(LIST_WIDTH)
     list:EnableMouse(true)
     list:EnableMouseWheel(true)
     list.offset = 0
     list.title = list:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     list.title:SetPoint("TOPLEFT", PAD, -9)
     list.title:SetTextColor(unpack(C.dim))
+    list.title:SetJustifyH("LEFT")
+    list.title:SetWordWrap(false)
     list.close = MakeButton(list, "cross", L("Close"), function() list:Hide() end)
     list.close:SetPoint("TOPRIGHT", -4, -4)
+    list.title:SetWidth(LIST_WIDTH - PAD - list.close:GetWidth() - 10)
     list.rows = {}
     for r = 1, LIST_ROWS do
         local row = CreateFrame("Button", nil, list)
         row:SetHeight(18)
-        row:SetPoint("TOPLEFT", 4, -28 - (r - 1) * 18)
-        row:SetPoint("TOPRIGHT", -4, -28 - (r - 1) * 18)
+        row:SetPoint("TOPLEFT", LIST_ROW_INSET, -28 - (r - 1) * 18)
+        row:SetPoint("TOPRIGHT", -LIST_ROW_INSET, -28 - (r - 1) * 18)
         row.hl = row:CreateTexture(nil, "BACKGROUND")
         row.hl:SetAllPoints()
         row.hl:SetColorTexture(1, 1, 1, 0)
         row.num = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        row.num:SetPoint("LEFT", 6, 0)
-        row.num:SetWidth(30)
+        row.num:SetPoint("LEFT", LIST_ROW_PAD, 0)
+        row.num:SetWidth(LIST_NUMBER_WIDTH)
         row.num:SetJustifyH("RIGHT")
         row.pill = MakePill(row)
-        row.pill:SetPoint("RIGHT", -6, 0)
+        row.pill:SetPoint("RIGHT", -LIST_ROW_PAD, 0)
         row.text = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        row.text:SetPoint("LEFT", row.num, "RIGHT", 8, 0)
-        row.text:SetPoint("RIGHT", row.pill, "LEFT", -6, 0)
+        row.text:SetPoint("LEFT", row.num, "RIGHT", LIST_TITLE_GAP, 0)
         row.text:SetJustifyH("LEFT")
         row.text:SetWordWrap(false)
         row:SetScript("OnEnter", function(self)
             self.hl:SetColorTexture(1, 1, 1, 0.08)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetText(L("Click: go to this step"), 1, 1, 1)
+            if self.summary and self.summary ~= "" then GameTooltip:AddLine(self.summary, 1, 1, 1, true) end
             GameTooltip:AddLine(L("Right-click: mark it done (if you already did it)"), 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
@@ -2597,12 +2601,13 @@ function card.FillStepList()
         for r, row in ipairs(list.rows) do
             row:SetHeight(rowH)
             row:ClearAllPoints()
-            row:SetPoint("TOPLEFT", 4, -28 - (r - 1) * rowH)
-            row:SetPoint("TOPRIGHT", -4, -28 - (r - 1) * rowH)
+            row:SetPoint("TOPLEFT", LIST_ROW_INSET, -28 - (r - 1) * rowH)
+            row:SetPoint("TOPRIGHT", -LIST_ROW_INSET, -28 - (r - 1) * rowH)
         end
         list:SetHeight(28 + LIST_ROWS * rowH + 8)
     end
     local cur = CurrentStep()
+    local titleWidth = LIST_WIDTH - 2 * (LIST_ROW_INSET + LIST_ROW_PAD) - LIST_NUMBER_WIDTH - LIST_TITLE_GAP
     for r, row in ipairs(list.rows) do
         local i = steps[list.offset + r]
         local step = i and guide.steps[i]
@@ -2612,9 +2617,12 @@ function card.FillStepList()
             SetFont(row.num, -1)
             SetFont(row.text, -1)
             row.num:SetText(i)
-            row.text:SetText(StepSummary(step))
             local status = not row.current and card.StepStatus(guide, i, cur) or nil
             row.pill:SetStatus(status)
+            local badgeWidth = row.pill:IsShown() and row.pill:GetWidth() + LIST_ROW_PAD or 0
+            row.text:SetWidth(math.max(1, titleWidth - badgeWidth))
+            row.summary = StepSummary(step)
+            row.text:SetText(row.summary)
             local done = status == "done" or status == "skipped"
             local color = row.current and C.blue or done and C.faint or C.text
             row.text:SetTextColor(unpack(color))

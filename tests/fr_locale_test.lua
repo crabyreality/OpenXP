@@ -21,6 +21,7 @@ end
 local locale = addon.locale
 local rudra = "Rudra Amberstill"
 assert(locale.Get("You get this quest at this step") == "Vous obtenez cette quête à cette étape.")
+assert(locale.Get("EARLIER STEPS") == "Étapes précédentes")
 assert(addon.GetCreatureName(rudra) == "Rudra Distillambre")
 
 addon.game = "FOREVER"

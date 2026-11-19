@@ -279,8 +279,13 @@ local function FrenchGuideName(name)
     elseif ref and ref[1] == "item" then
         local getItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
         translated = getItemInfo and getItemInfo(ref[2])
+        if not translated or translated == "" then
+            local db = addon.game == "FOREVER" and _G.LibQuestieDB
+            local items = db and db.Item
+            translated = items and items.name and items.name(ref[2])
+        end
     end
-    translated = translated or names[base or name]
+    if not translated or translated == "" then translated = names[base or name] end
     if translated then return translated .. (suffix or "") end
 end
 

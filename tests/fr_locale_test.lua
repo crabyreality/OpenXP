@@ -46,4 +46,20 @@ C_QuestLog = { GetTitleForQuestID = function(id) if id == 9 then return "Titre d
 assert(locale.GuideQuestName(9) == "Titre du journal")
 assert(locale.GuideQuestName(36) == "Le ragoût de la marche de l’Ouest")
 
+local spyLoot = "Kill |cRXP_ENEMY_Dark Iron Spies|r. Loot them for the |T237385:0|t[|cRXP_LOOT_Dark Iron Map|r]"
+local map = "|T237385:0|t[|cRXP_LOOT_Carte sombrefer|r]"
+assert(locale.GuideText(spyLoot) == "Tuez les |cRXP_ENEMY_espions Sombrefer|r et récupérez " .. map .. " sur eux.")
+local useMap = "|cRXP_WARN_Use the|r |T237385:0|t[|cRXP_LOOT_Dark Iron Map|r] |cRXP_WARN_to start the quest|r"
+assert(locale.GuideText(useMap) == "|cRXP_WARN_Utilisez|r " .. map .. " |cRXP_WARN_pour lancer la quête.|r")
+local ambusherLoot = "Kill |cRXP_ENEMY_Rockjaw Ambushers|r. Loot them for their |cRXP_LOOT_Stolen Blasting Powder|r"
+assert(locale.GuideText(ambusherLoot) ==
+    "Tuez les |cRXP_ENEMY_embusqués Mâcheroc|r et récupérez |cRXP_LOOT_Poudre explosive volée|r sur eux.")
+assert(locale.GuideQuestName(96391) == "La carte souterraine")
+
+LibQuestieDB.Item = { name = function(id) if id == 274268 then return "Nom dans QuestieDB" end end }
+C_Item = { GetItemInfo = function() return "" end }
+assert(locale.GuideTerm("Dark Iron Map") == "Nom dans QuestieDB")
+C_Item.GetItemInfo = function(id) if id == 274268 then return "Nom dans le client" end end
+assert(locale.GuideTerm("Dark Iron Map") == "Nom dans le client")
+
 print("French locale tests passed")

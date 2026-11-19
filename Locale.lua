@@ -267,12 +267,23 @@ function addon.locale.GuideQuestName(id)
     return addon.guideQuestNames[id]
 end
 
-local function FrenchGuideName(name)
+local function FrenchGuideName(name, kind)
     local names = addon.guideNamesFr
     if not names then return end
     local base, suffix = name:match("^(.-)(::%d+)$")
-    local ref = addon.guideNameIds and addon.guideNameIds[base or name]
+    base = base or name
+    local db = addon.game == "FOREVER" and _G.LibQuestieDB
+    local objects = db and db.Object
     local translated
+    if kind == "PICK" and addon.game == "FOREVER" then
+        local id = addon.guideObjectIdsFr and addon.guideObjectIdsFr[base]
+        translated = id and objects and objects.name and objects.name(id)
+        if not translated or translated == "" then
+            translated = addon.guideObjectNamesFr and addon.guideObjectNamesFr[base]
+        end
+    end
+    local creature = kind == "FRIENDLY" or kind == "ENEMY"
+    local ref = not translated and not creature and addon.guideNameIds and addon.guideNameIds[base]
     if ref and ref[1] == "spell" then
         local getSpellName = (C_Spell and C_Spell.GetSpellName) or GetSpellInfo
         translated = getSpellName and getSpellName(ref[2])
@@ -280,12 +291,13 @@ local function FrenchGuideName(name)
         local getItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
         translated = getItemInfo and getItemInfo(ref[2])
         if not translated or translated == "" then
-            local db = addon.game == "FOREVER" and _G.LibQuestieDB
             local items = db and db.Item
             translated = items and items.name and items.name(ref[2])
         end
+    elseif ref and ref[1] == "object" then
+        translated = objects and objects.name and objects.name(ref[2])
     end
-    if not translated or translated == "" then translated = names[base or name] end
+    if not translated or translated == "" then translated = names[base] end
     if translated then return translated .. (suffix or "") end
 end
 
@@ -295,11 +307,11 @@ function addon.locale.GuideTerm(name)
 end
 
 local function LocalName(raw)
-    local localized = raw:gsub("|cRXP_(%u+)_(.-)|r", function(kind, name)
+    local localized = raw:gsub("|cRXP_(%u+)_([^|]*)|r", function(kind, name)
         if not NAME_KINDS[kind] then return end
         local creature = kind == "FRIENDLY" or kind == "ENEMY"
         local translated = creature and addon.GetForeverCreatureName and addon.GetForeverCreatureName(name)
-        translated = translated or FrenchGuideName(name)
+        translated = translated or FrenchGuideName(name, kind)
         if not translated and creature and addon.GetCreatureName then translated = addon.GetCreatureName(name) end
         if translated then return "|cRXP_" .. kind .. "_" .. translated .. "|r" end
     end)
@@ -338,6 +350,8 @@ function addon.locale.GuideText(text)
     key = key:gsub("%d+", slot)
     local tr = n <= 26 and phrases[key] or phrases[body]
     if tr then
+        -- Names inside a coloured warning are literal in its template.
+        if addon.guideNamesFr then tr = LocalName(tr) end
         local function expand(c)
             local index = c:byte() - 64
             local s = slots[index]

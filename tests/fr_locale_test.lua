@@ -62,4 +62,19 @@ assert(locale.GuideTerm("Dark Iron Map") == "Nom dans QuestieDB")
 C_Item.GetItemInfo = function(id) if id == 274268 then return "Nom dans le client" end end
 assert(locale.GuideTerm("Dark Iron Map") == "Nom dans le client")
 
+names[3077] = "Mahnott Roughwound"
+names[1256] = "Responsable Thesten"
+assert(locale.GuideText(TalkTo("Mahnott")):find("Mahnott Roughwound", 1, true))
+assert(addon.GetCreatureName("Other display name::1256") == "Responsable Thesten::1256")
+assert(locale.GuideText("|cRXP_ENEMY_Owls|r") == "|cRXP_ENEMY_hiboux|r")
+assert(locale.GuideText("|cRXP_LOOT_Hides|r") == "|cRXP_LOOT_peaux|r")
+
+LibQuestieDB.Item.name = function(id) if id == 280042 then return "Tattered Spellbook" end end
+LibQuestieDB.Object = { name = function(id) if id == 671518 then return "Grimoire en lambeaux" end end }
+assert(locale.GuideText("|cRXP_PICK_Tattered Spellbook|r") == "|cRXP_PICK_Grimoire en lambeaux|r")
+assert(locale.GuideText("|cRXP_LOOT_Tattered Spellbook|r") == "|cRXP_LOOT_Tattered Spellbook|r")
+
+local grind = "|cRXP_WARN_Grind |cRXP_ENEMY_Mottled Boars|r. Loot them until you have 5 silver worth of vendor items|r"
+assert(locale.GuideText(grind):find("|cRXP_ENEMY_sangliers tachetés|r", 1, true))
+
 print("French locale tests passed")

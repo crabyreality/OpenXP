@@ -4,15 +4,20 @@ local locale = GetLocale()
 function addon.GetForeverCreatureName(name)
     local ids = addon.game == "FOREVER" and addon.foreverGuideNpcIds
     if not ids or not name then return end
-    local base, suffix = name:match("^(.-)(::%d+)$")
-    local id = ids[base or name]
+    local base, explicitId = name:match("^(.-)::(%d+)$")
+    base = base or name
+    local knownId = ids[base]
+    local id = tonumber(explicitId) or knownId
     if not id then return end
 
     -- Forever can keep a surname in English even on a French client.
     local db = _G.LibQuestieDB
     local npc = db and db.Npc
     local localized = npc and npc.name and npc.name(id)
-    if localized and localized ~= "" then return localized .. (suffix or "") end
+    if not localized or localized == "" then
+        localized = id == knownId and addon.guideNamesFr and addon.guideNamesFr[base]
+    end
+    if localized and localized ~= "" then return localized .. (explicitId and "::" .. explicitId or "") end
     return name
 end
 

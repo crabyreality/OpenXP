@@ -39,11 +39,18 @@ def write_guides():
         ("quests", "guideQuestNames"),
         ("titles", "guideTitles"),
         ("ids", "guideNameIds"),
+        ("objectIds", "guideObjectIdsFr"),
+        ("objectNames", "guideObjectNamesFr"),
     ):
         lines.extend(("", f"addon.{field} = {{"))
         for english, french in sorted(data[key].items()):
             source = str(int(english)) if key == "quests" else lua_str(english)
-            value = "{" + lua_str(french[0]) + ", " + str(french[1]) + "}" if key == "ids" else lua_str(french)
+            if key == "ids":
+                value = "{" + lua_str(french[0]) + ", " + str(french[1]) + "}"
+            elif key == "objectIds":
+                value = str(french)
+            else:
+                value = lua_str(french)
             lines.append(f"    [{source}] = {value},")
         lines.append("}")
     lines.extend(("", "-- English guide names matched to NPC IDs in QuestieDB for Forever.",
